@@ -11,7 +11,7 @@ guard :bundler do
   files.each { |file| watch(helper.real_path(file)) }
 end
 
-guard :rspec, cmd: 'bundle exec rspec' do
+guard :rspec, cmd: 'bundle exec rspec -f d' do
   require 'guard/rspec/dsl'
 
   dsl = Guard::RSpec::Dsl.new(self)

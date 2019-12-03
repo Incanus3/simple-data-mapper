@@ -1,0 +1,22 @@
+require 'simple_dm'
+require 'simple_dm/backends'
+
+class TestRepo < SDM::Repository
+  Types = SDM::Types
+
+  class Users < SDM::Relation
+    schema do
+      attribute :email, Types::Strict::String.constrained(
+        max_size: 64,
+        format: /\A[\w+\-.]+@[a-z\d\-]+(\.[a-z]+)*\.[a-z]+\z/i
+      )
+
+      attribute :username,   Types::Strict::String.constrained(max_size: 32)
+      attribute :first_name, Types::Strict::String.constrained(max_size: 32).optional.default(nil)
+      attribute :last_name,  Types::Strict::String.constrained(max_size: 32).optional.default(nil)
+    end
+  end
+
+  register_relation Users
+  register_backend  SDM::Backends::InMemoryBackend
+end

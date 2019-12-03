@@ -1,3 +1,5 @@
+require 'transproc'
+
 module SimpleDM
   module Utils
     module_function

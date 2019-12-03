@@ -1,6 +1,9 @@
 source 'https://rubygems.org'
 
-gem 'sequel'
+gem 'dry-struct'
+gem 'dry-types'
+gem 'transproc'
+# gem 'sequel'
 
 group :development do
   gem 'guard'
