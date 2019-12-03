@@ -52,9 +52,9 @@ RSpec.describe do # rubocop:disable Metrics/BlockLength
       repo = TestRepo.postgres(host: 'localhost', database: 'simple_dm',
                                user: 'jakub',     password: 'jakub')
 
-      users = repo.users
+      dataset = repo.users.all
 
-      expect { users.all }.to raise_exception NotImplementedError
+      expect { dataset.to_a }.to raise_exception NotImplementedError
     end
   end
 end

@@ -9,20 +9,28 @@ module SimpleDM
         @data = Hash.new { |hash, key| hash[key] = [] }
       end
 
-      def store(relation_name, attributes)
-        data[relation_name] << attributes
+      def store(group_name, attributes)
+        data[group_name] << attributes
       end
 
-      def fetch_all(relation_name)
-        data[relation_name]
-      end
-
-      def fetch_filtered(relation_name, **filters)
-        fetch_all(relation_name)
-          .filter { |record| filters.all? { |attr, value| record[attr] == value } }
+      def fetch(group_name, query)
+        if query.filters.empty?
+          fetch_all(group_name)
+        else
+          fetch_filtered(group_name, query.filters)
+        end
       end
 
       private
+
+      def fetch_all(group_name)
+        data[group_name]
+      end
+
+      def fetch_filtered(group_name, filters)
+        fetch_all(group_name)
+          .filter { |record| filters.all? { |attr, value| record[attr] == value } }
+      end
 
       attr_reader :data
     end

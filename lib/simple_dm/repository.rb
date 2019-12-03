@@ -18,23 +18,17 @@ module SimpleDM
       attr_writer :default_registered_name
     end
 
-    def store(_relation_name, _attributes)
+    def store(_group_name, _attributes)
       raise NotImplementedError
     end
 
-    def fetch_all(_relation_name)
-      raise NotImplementedError
-    end
-
-    def fetch_filtered(_relation_name, **_filters)
+    def fetch(_group_name, _query)
       raise NotImplementedError
     end
   end
 
 
   class Repository
-    extend Forwardable
-
     class << self
       attr_reader :relations
 
@@ -47,7 +41,7 @@ module SimpleDM
         as ||= Utils.snake_case(Utils.class_name(relation_class))
 
         define_method(as) do
-          relation_class.new(self, as)
+          relation_class.new(data_provider, as)
         end
 
         relations[as] = relation_class
@@ -69,10 +63,8 @@ module SimpleDM
       attr_reader :backends
     end
 
-    def_delegators :@backend, :store, :fetch_all, :fetch_filtered
-
     def initialize(backend)
-      @backend = backend
+      @data_provider = Internal::DataProvider.new(backend)
     end
 
     def relations
@@ -81,7 +73,20 @@ module SimpleDM
 
     private
 
-    attr_reader :backend
+    attr_reader :data_provider
+  end
+
+
+  module Internal
+    class DataProvider
+      extend Forwardable
+
+      def_delegators :@backend, :store, :fetch
+
+      def initialize(backend)
+        @backend = backend
+      end
+    end
   end
 end
 
