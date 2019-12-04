@@ -52,4 +52,10 @@ RSpec.describe do # rubocop:disable Metrics/BlockLength
       relation.create(username: 'tomas', email: 'non-email')
     end.to raise_exception SDM::ValidationError
   end
+
+  it 'fails if given extra attributes' do
+    expect do
+      relation.create(username: 'tomas', email: 'tomas@test.cz', extra: true)
+    end.to raise_exception SDM::ValidationError
+  end
 end

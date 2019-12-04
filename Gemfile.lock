@@ -114,6 +114,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  dry-core
   dry-struct
   dry-types
   guard

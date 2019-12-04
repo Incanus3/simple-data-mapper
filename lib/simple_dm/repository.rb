@@ -1,9 +1,6 @@
 require_relative './utils'
 require_relative './relation'
 
-# TODO: add mappers
-# TODO: add validations
-
 module SimpleDM
   class Backend
     @default_registered_name = nil

@@ -1,5 +1,6 @@
 source 'https://rubygems.org'
 
+gem 'dry-core'
 gem 'dry-struct'
 gem 'dry-types'
 gem 'transproc'

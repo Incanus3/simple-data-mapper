@@ -8,6 +8,9 @@ Layout/EmptyLineBetweenDefs:
   AllowAdjacentOneLineDefs: true
   NumberOfEmptyLines: [1, 2]
 
+Layout/MultilineMethodCallIndentation:
+  EnforcedStyle: indented
+
 Layout/SpaceInsideArrayLiteralBrackets:
   Enabled: false
 
@@ -16,6 +19,9 @@ Layout/SpaceInsideParens:
 
 Metrics/LineLength:
   Max: 100
+
+Metrics/MethodLength:
+  Max: 15
 
 Metrics/ParameterLists:
   CountKeywordArgs: false

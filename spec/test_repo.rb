@@ -6,14 +6,16 @@ class TestRepo < SDM::Repository
 
   class Users < SDM::Relation
     schema do
+      primary_key
+
       attribute :email, Types::Strict::String.constrained(
         max_size: 64,
         format: /\A[\w+\-.]+@[a-z\d\-]+(\.[a-z]+)*\.[a-z]+\z/i
       )
 
-      attribute :username,   Types::Strict::String.constrained(max_size: 32)
-      attribute :first_name, Types::Strict::String.constrained(max_size: 32).optional.default(nil)
-      attribute :last_name,  Types::Strict::String.constrained(max_size: 32).optional.default(nil)
+      attribute  :username,   Types::Strict::String.constrained(max_size: 32)
+      attribute? :first_name, Types::Strict::String.constrained(max_size: 32).optional
+      attribute? :last_name,  Types::Strict::String.constrained(max_size: 32).optional
     end
   end
 

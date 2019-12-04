@@ -13,6 +13,7 @@ module SimpleDM
         data[group_name] << attributes
       end
 
+      # TODO: apply query.limit
       def fetch(group_name, query)
         if query.filters.empty?
           fetch_all(group_name)

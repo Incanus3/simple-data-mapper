@@ -1,45 +1,74 @@
+require 'dry/core/class_attributes'
 require 'dry-struct'
 require 'dry-types'
 
 require_relative './utils'
 
 module SimpleDM
+  module Constants
+    Undefined = Dry::Core::Constants::Undefined
+  end
+
+
   class ValidationError < RuntimeError
   end
 
+
   class Relation
+    extend Dry::Core::ClassAttributes
+
+    class EntityClassAlreadyDefined < RuntimeError
+      def initialize
+        super('Entity class is already defined')
+      end
+    end
+
+    class InvalidEntityClass < RuntimeError
+      def initialize
+        super('Entity class is not a subclass of SimpleDM::Entity')
+      end
+    end
+
+    class InvalidMappersClass < RuntimeError
+      def initialize
+        super('Mappers class is not a subclass of SimpleDM::Mappers')
+      end
+    end
+
+    defines :default_mappers
+
+    default_mappers [:identity]
+
     class << self
       def inherited(relation_class)
-        # TODO: don't overwrite, raise if not Dataset subclass
+        super(relation_class)
+
         relation_class.const_set('Dataset', Class.new(Dataset))
       end
 
       def schema(&block)
-        # builder = Internal::SchemaBuilder.new
-        # builder.instance_eval(&block)
+        raise EntityClassAlreadyDefined if const_defined?('Entity')
 
-        # TODO: raise if both custom Entity defined and schema called
         const_set('Entity', Class.new(Entity, &block))
       end
-
-      attr_reader :schema_block
     end
 
-    def initialize(data_provider, registered_name, mapper_name = :identity)
+    def initialize(data_provider, registered_name, mapper_names = self.class.default_mappers)
       @data_provider   = data_provider
       @registered_name = registered_name
-      @mapper_name     = mapper_name
-      @mappers         = Mappers.new(self)
+      @mapper_names    = mapper_names
+      mappers          = mappers_class.new(self)
+      @mapper          = mapper_names.map { |mapper_name| mappers[mapper_name] }.reduce(&:>>)
     end
 
-    def as(mapper_name)
-      self.class.new(data_provider, registered_name, mapper_name)
+    def with_mappers(*mapper_names)
+      self.class.new(data_provider, registered_name, mapper_names)
     end
+
+    alias as with_mappers
 
     def create(**attributes)
-      entity = mappers[:entity].call(attributes)
-
-      validated_attributes = entity.to_h
+      validated_attributes = validate(attributes)
 
       data_provider.store(registered_name, validated_attributes)
 
@@ -50,28 +79,54 @@ module SimpleDM
       create_dataset
     end
 
+    def first
+      mapper.call(data_provider.fetch(registered_name, Query.new(limit: 1)).first)
+    end
+
+    def last
+      mapper.call(data_provider.fetch(registered_name, Query.new(limit: 1)).last)
+    end
+
     def where(**filters)
       create_dataset(filters: filters)
     end
 
     def entity_class
-      self.class.const_get('Entity')
+      return @__entity_class if @__entity_class
+
+      eclass = self.class.const_get('Entity')
+
+      raise InvalidEntityClass unless eclass < Entity
+
+      @__entity_class = eclass
     end
 
     private
 
-    attr_reader :data_provider, :registered_name, :mapper_name, :mappers
+    attr_reader :data_provider, :registered_name, :mapper_names, :mapper
 
     def dataset_class
       self.class.const_get('Dataset')
+    end
+
+    def mappers_class
+      return @__mappers_class if @__mappers_class
+
+      mclass = self.class.const_defined?('Mappers') && self.class.const_get('Mappers') || Mappers
+
+      raise InvalidMappersClass unless mclass <= Mappers
+
+      @__mappers_class = mclass
     end
 
     def create_dataset(**kwargs)
       dataset_class.new(data_provider, registered_name, mapper: mapper, **kwargs)
     end
 
-    def mapper
-      mappers[mapper_name]
+    def validate(attributes)
+      entity_class.schema.apply(attributes)
+    rescue Dry::Types::CoercionError => e
+      raise ValidationError, e
     end
   end
 
@@ -81,7 +136,14 @@ module SimpleDM
   end
 
 
-  class Entity < Dry::Struct
+  class Entity < Dry::Struct::Value
+    schema schema.strict
+
+    transform_keys(&:to_sym)
+
+    def self.primary_key(name = :id)
+      attribute(name, Types::Strict::Integer.default { Time.now.to_i }) # for now
+    end
   end
 
 
@@ -104,10 +166,11 @@ module SimpleDM
 
 
   class Query
-    attr_reader :filters
+    attr_reader :filters, :limit
 
-    def initialize(filters: {})
+    def initialize(filters: {}, limit: nil)
       @filters = filters
+      @limit   = limit
     end
   end
 
@@ -119,6 +182,12 @@ module SimpleDM
       @relation = relation
 
       import :identity, from: Transproc::Coercions
+
+      import_mappers
+    end
+
+    def import_mappers
+      # serves as a hook for subclasses
     end
 
     def entity(attributes)
@@ -131,15 +200,4 @@ module SimpleDM
 
     attr_reader :relation
   end
-
-
-  # module Internal
-  #   class SchemaBuilder
-  #     def primary_key(column_name)
-  #     end
-
-  #     def string(column_name, max_length: nil, unique: false)
-  #     end
-  #   end
-  # end
 end
