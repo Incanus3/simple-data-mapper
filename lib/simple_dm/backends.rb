@@ -1,6 +1,28 @@
 require_relative 'repository'
 
 module SimpleDM
+  class Backend
+    @default_registered_name = nil
+
+    class << self
+      def default_registered_name
+        @default_registered_name or raise 'default registered name not provided'
+      end
+
+      private
+
+      attr_writer :default_registered_name
+    end
+
+    def store(_group_name, _attributes)
+      raise NotImplementedError
+    end
+
+    def fetch(_group_name, _query)
+      raise NotImplementedError
+    end
+  end
+
   module Backends
     class InMemoryBackend < SimpleDM::Backend
       self.default_registered_name = :in_memory

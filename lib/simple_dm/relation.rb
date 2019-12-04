@@ -1,22 +1,13 @@
 require 'dry/core/class_attributes'
-require 'dry-struct'
-require 'dry-types'
 
-require_relative './utils'
+require_relative './query'
+require_relative './entity'
+require_relative './dataset'
+require_relative './mappers'
+require_relative './exceptions'
 
 module SimpleDM
-  module Constants
-    Undefined = Dry::Core::Constants::Undefined
-  end
-
-
-  class ValidationError < RuntimeError
-  end
-
-
   class Relation
-    extend Dry::Core::ClassAttributes
-
     class EntityClassAlreadyDefined < RuntimeError
       def initialize
         super('Entity class is already defined')
@@ -34,6 +25,8 @@ module SimpleDM
         super('Mappers class is not a subclass of SimpleDM::Mappers')
       end
     end
+
+    extend Dry::Core::ClassAttributes
 
     defines :default_mappers
 
@@ -128,76 +121,5 @@ module SimpleDM
     rescue Dry::Types::CoercionError => e
       raise ValidationError, e
     end
-  end
-
-
-  module Types
-    include Dry.Types()
-  end
-
-
-  class Entity < Dry::Struct::Value
-    schema schema.strict
-
-    transform_keys(&:to_sym)
-
-    def self.primary_key(name = :id)
-      attribute(name, Types::Strict::Integer.default { Time.now.to_i }) # for now
-    end
-  end
-
-
-  class Dataset
-    def initialize(data_provider, group_name, mapper:, **query_options)
-      @data_provider = data_provider
-      @group_name    = group_name
-      @mapper        = mapper
-      @query         = Query.new(**query_options)
-    end
-
-    def to_a
-      data_provider.fetch(group_name, query).map(&mapper)
-    end
-
-    private
-
-    attr_reader :data_provider, :group_name, :mapper, :query
-  end
-
-
-  class Query
-    attr_reader :filters, :limit
-
-    def initialize(filters: {}, limit: nil)
-      @filters = filters
-      @limit   = limit
-    end
-  end
-
-
-  class Mappers
-    include Transproc::Registry
-
-    def initialize(relation)
-      @relation = relation
-
-      import :identity, from: Transproc::Coercions
-
-      import_mappers
-    end
-
-    def import_mappers
-      # serves as a hook for subclasses
-    end
-
-    def entity(attributes)
-      relation.entity_class.new(**attributes)
-    rescue Dry::Struct::Error => e
-      raise ValidationError, e
-    end
-
-    private
-
-    attr_reader :relation
   end
 end

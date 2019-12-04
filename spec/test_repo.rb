@@ -1,5 +1,4 @@
 require 'simple_dm'
-require 'simple_dm/backends'
 
 class TestRepo < SDM::Repository
   Types = SDM::Types
