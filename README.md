@@ -1,4 +1,4 @@
-# sudoku-server
+# simple-data-mapper
 
 ## install dependencies
 ```bash
