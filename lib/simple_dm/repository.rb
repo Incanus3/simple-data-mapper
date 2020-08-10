@@ -4,7 +4,7 @@ require_relative './relation'
 module SimpleDM
   class Repository
     class << self
-      attr_reader :relations
+      attr_reader :relations, :backends
 
       def inherited(repository_class)
         repository_class.instance_variable_set(:@relations, {})
@@ -25,16 +25,15 @@ module SimpleDM
         backends[as] = backend_class
 
         define_singleton_method(as) do |*args, **kwargs|
-          backend = if args.empty? && kwargs.empty?
-                    then backend_class.new
-                    else backend_class.new(*args, **kwargs)
-                    end
+          backend =
+            if args.empty? && kwargs.empty?
+            then backend_class.new
+            else backend_class.new(*args, **kwargs)
+            end
 
           new(backend)
         end
       end
-
-      attr_reader :backends
     end
 
     def initialize(backend)

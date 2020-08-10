@@ -7,6 +7,7 @@ SimpleCov.start
 
 ENV['APP_ENV'] = 'test'
 
+# rubocop:disable Style/MethodCallWithArgsParentheses
 RSpec.configure do |config|
   config.disable_monkey_patching!
 
@@ -24,3 +25,4 @@ RSpec.configure do |config|
 
   config.default_formatter = 'doc' if config.files_to_run.one?
 end
+# rubocop:enable Style/MethodCallWithArgsParentheses

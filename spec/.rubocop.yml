@@ -1,0 +1,20 @@
+inherit_from:
+  - ../.rubocop.yml
+
+inherit_mode:
+  merge:
+    - IgnoredMethods
+
+Metrics/BlockLength:
+  Max: 30
+
+Style/MethodCallWithArgsParentheses:
+  IgnoredMethods:
+    - be
+    - be_a
+    - describe
+    - eq
+    - include
+    - not_to
+    - to
+    - raise_exception

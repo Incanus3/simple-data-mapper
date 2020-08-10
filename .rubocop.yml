@@ -1,3 +1,12 @@
+AllCops:
+  EnabledByDefault: true
+  Exclude:
+    - 'bin/*'
+  TargetRubyVersion: 2.7
+
+Bundler/GemComment:
+  Enabled: false
+
 Layout/HeredocIndentation:
   Enabled: false
 
@@ -8,6 +17,15 @@ Layout/EmptyLineBetweenDefs:
   AllowAdjacentOneLineDefs: true
   NumberOfEmptyLines: [1, 2]
 
+Layout/FirstMethodArgumentLineBreak:
+  Enabled: false
+
+Layout/LineLength:
+  Max: 100
+
+Layout/MultilineMethodArgumentLineBreaks:
+  Enabled: false
+
 Layout/MultilineMethodCallIndentation:
   EnforcedStyle: indented
 
@@ -17,8 +35,11 @@ Layout/SpaceInsideArrayLiteralBrackets:
 Layout/SpaceInsideParens:
   Enabled: false
 
-Metrics/LineLength:
-  Max: 100
+Lint/ConstantResolution:
+  Enabled: false
+
+Metrics/BlockLength:
+  Max: 10
 
 Metrics/MethodLength:
   Max: 15
@@ -35,10 +56,23 @@ Style/AccessModifierDeclarations:
 Style/AndOr:
   EnforcedStyle: conditionals
 
-Style/BracesAroundHashParameters:
+Style/BlockDelimiters:
+  EnforcedStyle: semantic
+  AllowBracesOnProceduralOneLiners: true
+
+Style/ConstantVisibility:
+  Enabled: false
+
+Style/Copyright:
+  Enabled: false
+
+Style/DisableCopsWithinSourceCodeDirective:
   Enabled: false
 
 Style/Documentation:
+  Enabled: false
+
+Style/DocumentationMethod:
   Enabled: false
 
 Style/EmptyMethod:
@@ -46,3 +80,22 @@ Style/EmptyMethod:
 
 Style/FrozenStringLiteralComment:
   Enabled: false
+
+Style/ImplicitRuntimeError:
+  Enabled: false
+
+Style/InlineComment:
+  Enabled: false
+
+Style/MethodCallWithArgsParentheses:
+  IgnoredMethods:
+    - import
+    - gem
+    - p
+    - pp
+    - puts
+    - raise
+    - require
+    - require_relative
+    - source
+    - yield

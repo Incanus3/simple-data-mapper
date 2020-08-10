@@ -1,16 +1,16 @@
 require 'spec_helper'
 require 'test_repo'
 
-RSpec.describe do # rubocop:disable Metrics/BlockLength
+RSpec.describe do
   context 'in memory backend' do
     let(:repo) { TestRepo.in_memory }
 
-    let!(:tomas ) { repo.users.create(username: 'tomas',  email: 'tomas@test.cz') }
+    let!(:tomas ) { repo.users.create(username: 'tomas',  email: 'tomas@test.cz')  }
     let!(:prokop) { repo.users.create(username: 'prokop', email: 'prokop@test.cz') }
 
     it 'create returns record' do
       expect(tomas[:username]).to eq 'tomas'
-      expect(prokop[:email]).to eq 'prokop@test.cz'
+      expect(prokop[:email]  ).to eq 'prokop@test.cz'
     end
 
     it 'all returns dataset with all records' do

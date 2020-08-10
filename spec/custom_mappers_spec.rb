@@ -40,10 +40,10 @@ RSpec.describe do
   it 'works with composite mappers' do
     created_tomas = relation.as(:entity)
       .create(username: 'tomas', email: 'tomas@test.cz')
-    created_lukas = relation.as(:entity, :upcase_username)
+    created_lukas = relation.with_mappers(:entity, :upcase_username)
       .create(username: 'lukas', email: 'lukas@test.cz')
 
-    fetched_tomas = relation.as(:entity, :upcase_username).first
+    fetched_tomas = relation.with_mappers(:entity, :upcase_username).first
     fetched_lukas = relation.as(:entity).last
 
     expect(created_tomas.username).to eq 'tomas'

@@ -9,7 +9,7 @@ class DefaultMappersTestRepo < TestRepo
   register_relation UsersWithDefaultMappers, as: :users
 end
 
-RSpec.describe do # rubocop:disable Metrics/BlockLength
+RSpec.describe do
   shared_examples 'examples' do
     let!(:tomas ) { relation.create(username: 'tomas',  email: 'tomas@test.cz')  }
     let!(:prokop) { relation.create(username: 'prokop', email: 'prokop@test.cz') }

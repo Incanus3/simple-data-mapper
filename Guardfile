@@ -28,7 +28,7 @@ guard :rspec, cmd: 'bundle exec rspec -f d' do
   watch(dsl.rspec.spec_support) { dsl.rspec.spec_dir }
 end
 
-guard :rubocop do
+guard :rubocop, cli: ['-D'] do
   watch(/.+\.rb$/)
   watch(%r{(?:.+/)?\.rubocop(?:_todo)?\.yml$}) { |m| File.dirname(m[0]) }
 end
